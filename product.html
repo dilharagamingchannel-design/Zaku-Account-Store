@@ -55,8 +55,10 @@
                         <a href="index.html"
                             class="font-rajdhani font-semibold text-lg text-gray-300 hover:text-white hover:border-b-2 hover:border-orange px-3 py-2 transition-all">Home</a>
                         <a href="shop.html"
-                            class="font-rajdhani font-semibold text-lg text-gold border-b-2 border-gold px-3 py-2 transition-all">Shop
+                            class="font-rajdhani font-semibold text-lg text-gray-300 hover:text-white hover:border-b-2 hover:border-orange px-3 py-2 transition-all">Shop
                             Accounts</a>
+                        <a href="payment.html"
+                            class="font-rajdhani font-semibold text-lg text-gray-300 hover:text-white hover:border-b-2 hover:border-orange px-3 py-2 transition-all">Payments</a>
                         <a href="contact.html"
                             class="font-rajdhani font-semibold text-lg text-gray-300 hover:text-white hover:border-b-2 hover:border-orange px-3 py-2 transition-all">Contact
                             Us</a>
@@ -80,6 +82,8 @@
                 <a href="shop.html"
                     class="text-gold block px-3 py-4 rounded-md text-base font-medium border-l-4 border-gold bg-white/5">Shop
                     Accounts</a>
+                <a href="payment.html"
+                    class="text-gray-300 hover:text-white hover:bg-white/5 block px-3 py-4 rounded-md text-base font-medium transition-all">Payments</a>
                 <a href="contact.html"
                     class="text-gray-300 hover:text-white hover:bg-white/5 block px-3 py-4 rounded-md text-base font-medium transition-all">Contact
                     Us</a>
@@ -248,8 +252,14 @@
 
                         <!-- Details Section -->
                         <div>
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="bg-gradient-to-r from-orange to-red-600 text-white text-xs font-bold px-2 py-1 rounded uppercase tracking-wider">Verified Stock</span>
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="bg-gradient-to-r from-orange to-red-600 text-white text-xs font-bold px-2 py-1 rounded uppercase tracking-wider">Verified Stock</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-gray-400 text-sm font-rajdhani">
+                                    <i class="fa-regular fa-eye text-gold"></i>
+                                    <span id="view-counter">Loading...</span> Views
+                                </div>
                             </div>
                             <h1 class="text-4xl md:text-5xl font-orbitron font-bold text-white mb-4 leading-tight">${account.title}</h1>
                             
@@ -382,15 +392,46 @@
         window.addEventListener('load', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const productId = urlParams.get('id');
-            if (productId && localStorage.getItem(`liked_${productId}`)) {
-                const likeBtn = document.getElementById('like-btn');
-                if (likeBtn) {
-                    const icon = likeBtn.querySelector('i');
-                    icon.classList.remove('fa-regular');
-                    icon.classList.add('fa-solid', 'text-orange');
+            if (productId) {
+                // Handle Views
+                incrementViewCount(productId);
+
+                // Handle Likes
+                if (localStorage.getItem(`liked_${productId}`)) {
+                    const likeBtn = document.getElementById('like-btn');
+                    if (likeBtn) {
+                        const icon = likeBtn.querySelector('i');
+                        icon.classList.remove('fa-regular');
+                        icon.classList.add('fa-solid', 'text-orange');
+                    }
                 }
             }
         });
+
+        // View Counter Logic
+        function incrementViewCount(id) {
+            // Key for this product's views
+            const viewKey = `views_product_${id}`;
+            let views = parseInt(localStorage.getItem(viewKey));
+
+            if (!views) {
+                // If no views stored, generate a random starting number between 1500 and 5000 for realism
+                views = Math.floor(Math.random() * (5000 - 1500 + 1)) + 1500;
+            }
+
+            // Increment view count for this session
+            if (!sessionStorage.getItem(`viewed_${id}`)) {
+                views += 1;
+                sessionStorage.setItem(`viewed_${id}`, 'true');
+                localStorage.setItem(viewKey, views.toString());
+            }
+
+            // Display views
+            const counterElement = document.getElementById('view-counter');
+            if (counterElement) {
+                counterElement.innerText = views.toLocaleString();
+            }
+        }
     </script>
 
     <!-- Payment Modal HTML -->
